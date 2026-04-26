@@ -85,12 +85,24 @@ try:
     def speak_web(text):
         if not text:
             return
-        word = text.strip().lower().replace(" ", "%20")
-        url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q={word}"
         try:
-            webbrowser.open(url)
+            word = urllib.parse.quote(text.strip().lower())
+            url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl=en&client=tw-ob&q={word}"
+            if platform == 'android':
+                try:
+                    from jnius import autoclass
+                    Intent = autoclass('android.content.Intent')
+                    Uri = autoclass('android.net.Uri')
+                    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+                    intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    PythonActivity.mActivity.startActivity(intent)
+                except Exception:
+                    toast("TTS unavailable.")
+            else:
+                webbrowser.open(url)
         except Exception:
-            toast("Cannot open browser for TTS.")
+            toast("TTS unavailable.")
 
     def speak(text):
         try:
@@ -164,8 +176,22 @@ try:
             speak(word.lower())
 
         def search_word_web(self, word):
-            if word:
-                webbrowser.open(f"https://www.google.com/search?q=define+{word.lower()}")
+            if not word:
+                return
+            try:
+                url = f"https://www.google.com/search?q=define+{word.lower()}"
+                if platform == 'android':
+                    from jnius import autoclass
+                    Intent = autoclass('android.content.Intent')
+                    Uri = autoclass('android.net.Uri')
+                    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+                    intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    PythonActivity.mActivity.startActivity(intent)
+                else:
+                    webbrowser.open(url)
+            except Exception:
+                toast("Cannot open browser.")
 
         def open_web_search(self):
             if not self.web_dialog:
@@ -188,9 +214,23 @@ try:
 
         def do_web_search(self, *args):
             word = self.search_input_dialog.text.strip()
-            if word:
-                webbrowser.open(f"https://www.google.com/search?q=define+{word}")
             self.web_dialog.dismiss()
+            if not word:
+                return
+            try:
+                url = f"https://www.google.com/search?q=define+{word}"
+                if platform == 'android':
+                    from jnius import autoclass
+                    Intent = autoclass('android.content.Intent')
+                    Uri = autoclass('android.net.Uri')
+                    PythonActivity = autoclass('org.kivy.android.PythonActivity')
+                    intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    PythonActivity.mActivity.startActivity(intent)
+                else:
+                    webbrowser.open(url)
+            except Exception:
+                toast("Cannot open browser.")
 
         def delete_word_prompt(self, word_to_delete):
             word_to_delete = word_to_delete.lower()
@@ -622,11 +662,18 @@ try:
             if platform == 'android':
                 try:
                     from android.permissions import request_permissions, Permission
-                    request_permissions([
-                        Permission.INTERNET,
-                        Permission.READ_EXTERNAL_STORAGE,
-                        Permission.WRITE_EXTERNAL_STORAGE,
-                    ])
+                    from android import api_version
+                    if api_version >= 33:
+                        request_permissions([
+                            Permission.INTERNET,
+                            Permission.READ_MEDIA_IMAGES,
+                        ])
+                    else:
+                        request_permissions([
+                            Permission.INTERNET,
+                            Permission.READ_EXTERNAL_STORAGE,
+                            Permission.WRITE_EXTERNAL_STORAGE,
+                        ])
                 except Exception:
                     pass
 
