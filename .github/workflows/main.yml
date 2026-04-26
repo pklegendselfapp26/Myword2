@@ -33,9 +33,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             git zip unzip build-essential libssl-dev libffi-dev \
             libsqlite3-dev python3-dev autoconf libtool pkg-config \
-            zlib1g-dev libncurses5-dev cmake libltdl-dev patch \
-            libgstreamer1.0-dev gstreamer1.0-plugins-base \
-            gstreamer1.0-plugins-good
+            zlib1g-dev libncurses5-dev cmake libltdl-dev patch
 
       - name: Install buildozer and dependencies
         run: |
