@@ -3,10 +3,10 @@ title = My Word
 package.name = myword
 package.domain = org.myword
 source.dir = .
-source.include_exts = py,kv
-version = 1.3
+source.include_exts = py,kv,json,png,jpg,ttf
+version = 1.4
 
-requirements = python3,kivy==2.2.1
+requirements = python3,kivy==2.2.1,kivymd==1.1.1,plyer,pillow
 
 orientation = portrait
 fullscreen = 0
@@ -16,15 +16,11 @@ android.api = 33
 android.ndk = 25b
 android.ndk_api = 24
 
-android.permissions = INTERNET
+android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE
 android.archs = arm64-v8a
 android.allow_backup = True
 android.accept_sdk_license = True
 android.enable_androidx = True
-
-# Mali GPU fix for Realme/ColorOS
-android.add_jars =
-android.logcat_filters = *:S python:D
 
 [buildozer]
 log_level = 2
